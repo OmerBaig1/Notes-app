@@ -19,7 +19,7 @@ def init_db():
 
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row  # lets us access columns by name
+    conn.row_factory = sqlite3.Row  #Accesses columns by name
     return conn
 
 # --- Routes ---
@@ -28,7 +28,7 @@ def get_db_connection():
 def home():
     return render_template("index.html")
 
-# CREATE + READ all notes
+#CREATE + READ all notes
 @app.route("/notes", methods=["GET", "POST"])
 def notes():
     conn = get_db_connection()
@@ -42,12 +42,12 @@ def notes():
         conn.close()
         return jsonify({"status": "success"}), 201
 
-    # GET request — return all notes
+    #GET request — return all notes
     notes = conn.execute("SELECT * FROM notes").fetchall()
     conn.close()
     return jsonify([dict(note) for note in notes])
 
-# UPDATE and DELETE a specific note
+#UPDATE and DELETE a specific note
 @app.route("/notes/<int:note_id>", methods=["PUT", "DELETE"])
 def note(note_id):
     conn = get_db_connection()

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Notes App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>My Notes</h1>
+
+        <!-- Form to add a new note -->
+        <form id="note-form">
+            <input type="text" id="title" placeholder="Title" required>
+            <textarea id="content" placeholder="Write your note..."></textarea>
+            <button type="submit">Add Note</button>
+        </form>
+
+        <!-- Where notes will be displayed -->
+        <div id="notes-list"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
