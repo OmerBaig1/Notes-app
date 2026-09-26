@@ -11,7 +11,9 @@ def init_db():
         CREATE TABLE IF NOT EXISTS notes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
-            content TEXT
+            content TEXT,
+            color TEXT DEFAULT '#fafafa',
+            due_date TEXT
         )
     """)
     conn.commit()
@@ -35,14 +37,14 @@ def notes():
     if request.method == "POST":
         data = request.get_json()
         conn.execute(
-            "INSERT INTO notes (title, content) VALUES (?, ?)",
-            (data["title"], data.get("content", ""))
+            "INSERT INTO notes (title, content, color, due_date) VALUES (?, ?, ?, ?)",
+            (data["title"], data.get("content", ""), data.get("color", "#fafafa"), data.get("due_date"))
         )
         conn.commit()
         conn.close()
         return jsonify({"status": "success"}), 201
 
-    #GET request — return all notes
+    # GET request — return all notes
     notes = conn.execute("SELECT * FROM notes").fetchall()
     conn.close()
     return jsonify([dict(note) for note in notes])
@@ -54,8 +56,8 @@ def note(note_id):
     if request.method == "PUT":
         data = request.get_json()
         conn.execute(
-            "UPDATE notes SET title = ?, content = ? WHERE id = ?",
-            (data["title"], data.get("content", ""), note_id)
+            "UPDATE notes SET title = ?, content = ?, color = ?, due_date = ? WHERE id = ?",
+            (data["title"], data.get("content", ""), data.get("color", "#fafafa"), data.get("due_date"), note_id)
         )
         conn.commit()
         conn.close()

@@ -2,22 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Notes App</title>
+    <title>Notes App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>My Notes</h1>
+    <div class="page">
+        <div class="container">
+            <h1>Notes</h1>
 
-        <!-- Form to add a new note -->
-        <form id="note-form">
-            <input type="text" id="title" placeholder="Title" required>
-            <textarea id="content" placeholder="Write your note..."></textarea>
-            <button type="submit">Add Note</button>
-        </form>
+            <form id="note-form">
+                <input type="text" id="title" placeholder="Title" required>
+                <textarea id="content" placeholder="Write your note..."></textarea>
 
-        <!-- Where notes will be displayed -->
-        <div id="notes-list"></div>
+                <label for="due-date" style="font-size: 13px;">Due date (optional):</label>
+                <input type="date" id="due-date">
+
+                <div class="color-choices">
+                    <label><input type="radio" name="color" value="#FFF9B0" checked> Yellow</label>
+                    <label><input type="radio" name="color" value="#AEE1F9"> Light Blue</label>
+                    <label><input type="radio" name="color" value="#D6B4F7"> Purple</label>
+                    <label><input type="radio" name="color" value="#F9B4D0"> Pink</label>
+                </div>
+
+                <button type="submit">Add Note</button>
+            </form>
+
+            <div id="notes-list"></div>
+        </div>
+
+        <div class="sidebar">
+            <h2>Upcoming</h2>
+            <div id="upcoming-list"></div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
