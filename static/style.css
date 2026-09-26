@@ -52,6 +52,12 @@ button:hover {
     border-radius: 4px;
     padding: 10px;
     margin-bottom: 10px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.note p {
+    white-space: pre-wrap;
 }
 
 .note h3 {
