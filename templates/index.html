@@ -17,12 +17,14 @@
                 <label for="due-date" style="font-size: 13px;">Due date (optional):</label>
                 <input type="date" id="due-date">
 
-                <div class="color-choices">
-                    <label><input type="radio" name="color" value="#FFF9B0" checked> Yellow</label>
-                    <label><input type="radio" name="color" value="#AEE1F9"> Light Blue</label>
-                    <label><input type="radio" name="color" value="#D6B4F7"> Purple</label>
-                    <label><input type="radio" name="color" value="#F9B4D0"> Pink</label>
+                <label style="font-size: 13px;">Color:</label>
+                <div class="color-swatches" id="create-swatches">
+                    <div class="swatch selected" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
+                    <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
+                    <div class="swatch" data-color="#D6B4F7" style="background-color:#D6B4F7"></div>
+                    <div class="swatch" data-color="#F9B4D0" style="background-color:#F9B4D0"></div>
                 </div>
+                <input type="hidden" id="selected-color" value="#FFF9B0">
 
                 <button type="submit">Add Note</button>
             </form>
@@ -36,6 +38,31 @@
         </div>
     </div>
 
+    <!-- Edit Modal -->
+    <div id="edit-modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h2>Edit Note</h2>
+            <input type="text" id="edit-title" placeholder="Title">
+            <textarea id="edit-content" placeholder="Write your note..."></textarea>
+
+            <label style="font-size: 13px;">Due date:</label>
+            <input type="date" id="edit-due-date">
+
+            <label style="font-size: 13px;">Color:</label>
+            <div class="color-swatches" id="edit-swatches">
+                <div class="swatch" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
+                <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
+                <div class="swatch" data-color="#D6B4F7" style="background-color:#D6B4F7"></div>
+                <div class="swatch" data-color="#F9B4D0" style="background-color:#F9B4D0"></div>
+            </div>
+            <input type="hidden" id="edit-selected-color">
+
+            <div class="modal-actions">
+                <button id="save-edit-btn">Save</button>
+                <button id="cancel-edit-btn" type="button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-</html>

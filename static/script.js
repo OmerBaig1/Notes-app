@@ -4,13 +4,44 @@ const contentInput = document.getElementById("content");
 const notesList = document.getElementById("notes-list");
 const dueDateInput = document.getElementById("due-date");
 const upcomingList = document.getElementById("upcoming-list");
+const selectedColorInput = document.getElementById("selected-color");
+const createSwatches = document.querySelectorAll("#create-swatches .swatch");
 
-//Fetches notes from the server and displays them
+// Modal elements
+const modalOverlay = document.getElementById("edit-modal-overlay");
+const editTitleInput = document.getElementById("edit-title");
+const editContentInput = document.getElementById("edit-content");
+const editDueDateInput = document.getElementById("edit-due-date");
+const editSelectedColorInput = document.getElementById("edit-selected-color");
+const editSwatches = document.querySelectorAll("#edit-swatches .swatch");
+const saveEditBtn = document.getElementById("save-edit-btn");
+const cancelEditBtn = document.getElementById("cancel-edit-btn");
+
+let currentEditId = null;
+
+// --- Color swatch selection (create form) ---
+createSwatches.forEach(swatch => {
+    swatch.addEventListener("click", () => {
+        createSwatches.forEach(s => s.classList.remove("selected"));
+        swatch.classList.add("selected");
+        selectedColorInput.value = swatch.dataset.color;
+    });
+});
+
+// --- Color swatch selection (edit modal) ---
+editSwatches.forEach(swatch => {
+    swatch.addEventListener("click", () => {
+        editSwatches.forEach(s => s.classList.remove("selected"));
+        swatch.classList.add("selected");
+        editSelectedColorInput.value = swatch.dataset.color;
+    });
+});
+
+// Fetches notes from the server and displays them
 async function loadNotes() {
     const response = await fetch("/notes");
     const notes = await response.json();
 
-    // --- Main notes list ---
     notesList.innerHTML = "";
 
     notes.forEach(note => {
@@ -39,7 +70,7 @@ async function loadNotes() {
 
         const editBtn = document.createElement("button");
         editBtn.textContent = "Edit";
-        editBtn.onclick = () => editNote(note.id, note.title, note.content);
+        editBtn.onclick = () => openEditModal(note);
 
         const deleteBtn = document.createElement("button");
         deleteBtn.textContent = "Delete";
@@ -99,13 +130,13 @@ async function loadNotes() {
     });
 }
 
-//New Note
+// New Note
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const title = titleInput.value;
     const content = contentInput.value;
-    const color = document.querySelector('input[name="color"]:checked').value;
+    const color = selectedColorInput.value;
     const due_date = dueDateInput.value || null;
 
     await fetch("/notes", {
@@ -117,35 +148,55 @@ form.addEventListener("submit", async (e) => {
     titleInput.value = "";
     contentInput.value = "";
     dueDateInput.value = "";
+    createSwatches.forEach(s => s.classList.remove("selected"));
+    createSwatches[0].classList.add("selected");
+    selectedColorInput.value = createSwatches[0].dataset.color;
+
     loadNotes();
 });
 
-//Edits note
-async function editNote(id, oldTitle, oldContent) {
-    const newTitle = prompt("Edit title:", oldTitle);
-    if (newTitle === null) return;
+// --- Edit modal logic ---
+function openEditModal(note) {
+    currentEditId = note.id;
+    editTitleInput.value = note.title;
+    editContentInput.value = note.content;
+    editDueDateInput.value = note.due_date || "";
 
-    const newContent = prompt("Edit content:", oldContent);
+    const color = note.color || "#FFF9B0";
+    editSelectedColorInput.value = color;
+    editSwatches.forEach(s => {
+        s.classList.toggle("selected", s.dataset.color === color);
+    });
 
-    const response = await fetch("/notes");
-    const notes = await response.json();
-    const note = notes.find(n => n.id === id);
+    modalOverlay.classList.remove("hidden");
+}
 
-    await fetch(`/notes/${id}`, {
+function closeEditModal() {
+    modalOverlay.classList.add("hidden");
+    currentEditId = null;
+}
+
+cancelEditBtn.addEventListener("click", closeEditModal);
+
+saveEditBtn.addEventListener("click", async () => {
+    if (currentEditId === null) return;
+
+    await fetch(`/notes/${currentEditId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            title: newTitle,
-            content: newContent,
-            color: note.color,
-            due_date: note.due_date
+            title: editTitleInput.value,
+            content: editContentInput.value,
+            color: editSelectedColorInput.value,
+            due_date: editDueDateInput.value || null
         })
     });
 
+    closeEditModal();
     loadNotes();
-}
+});
 
-//Deletes note
+// Deletes note
 async function deleteNote(id) {
     const confirmed = confirm("Delete this note?");
     if (!confirmed) return;
