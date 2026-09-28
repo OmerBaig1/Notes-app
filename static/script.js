@@ -6,6 +6,10 @@ const dueDateInput = document.getElementById("due-date");
 const upcomingList = document.getElementById("upcoming-list");
 const selectedColorInput = document.getElementById("selected-color");
 const createSwatches = document.querySelectorAll("#create-swatches .swatch");
+const createColorToggle = document.getElementById("create-color-toggle");
+const createSwatchesPanel = document.getElementById("create-swatches");
+const editColorToggle = document.getElementById("edit-color-toggle");
+const editSwatchesPanel = document.getElementById("edit-swatches");
 
 // Modal elements
 const modalOverlay = document.getElementById("edit-modal-overlay");
@@ -19,25 +23,36 @@ const cancelEditBtn = document.getElementById("cancel-edit-btn");
 
 let currentEditId = null;
 
-// --- Color swatch selection (create form) ---
+document.querySelectorAll(".format-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const command = btn.dataset.command;
+        const targetBox = btn.dataset.target === "edit" ? editContentInput : contentInput;
+        targetBox.focus();
+        document.execCommand(command, false, null);
+    });
+});
+
+//Color swatch selection (create form) ---
 createSwatches.forEach(swatch => {
     swatch.addEventListener("click", () => {
         createSwatches.forEach(s => s.classList.remove("selected"));
         swatch.classList.add("selected");
         selectedColorInput.value = swatch.dataset.color;
+        createSwatchesPanel.classList.add("hidden");
     });
 });
 
-// --- Color swatch selection (edit modal) ---
+//Color swatch selection (edit modal) ---
 editSwatches.forEach(swatch => {
     swatch.addEventListener("click", () => {
         editSwatches.forEach(s => s.classList.remove("selected"));
         swatch.classList.add("selected");
         editSelectedColorInput.value = swatch.dataset.color;
+        editSwatchesPanel.classList.add("hidden");
     });
 });
 
-// Fetches notes from the server and displays them
+//Fetches notes from the server and displays them
 async function loadNotes() {
     const response = await fetch("/notes");
     const notes = await response.json();
@@ -53,7 +68,7 @@ async function loadNotes() {
         titleEl.textContent = note.title;
 
         const contentEl = document.createElement("p");
-        contentEl.textContent = note.content;
+        contentEl.innerHTML = note.content;
 
         noteDiv.appendChild(titleEl);
         noteDiv.appendChild(contentEl);
@@ -83,7 +98,7 @@ async function loadNotes() {
         notesList.appendChild(noteDiv);
     });
 
-    // --- Sidebar: notes with due dates, soonest first ---
+    //Sidebar: notes with due dates
     const notesWithDates = notes
         .filter(note => note.due_date)
         .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
@@ -130,12 +145,31 @@ async function loadNotes() {
     });
 }
 
+createColorToggle.addEventListener("click", () => {
+    createSwatchesPanel.classList.toggle("hidden");
+    editSwatchesPanel.classList.add("hidden"); // close the other one if open
+});
+
+editColorToggle.addEventListener("click", () => {
+    editSwatchesPanel.classList.toggle("hidden");
+    createSwatchesPanel.classList.add("hidden");
+});
+
+document.addEventListener("click", (e) => {
+    if (!createColorToggle.contains(e.target) && !createSwatchesPanel.contains(e.target)) {
+        createSwatchesPanel.classList.add("hidden");
+    }
+    if (!editColorToggle.contains(e.target) && !editSwatchesPanel.contains(e.target)) {
+        editSwatchesPanel.classList.add("hidden");
+    }
+});
+
 // New Note
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const title = titleInput.value;
-    const content = contentInput.value;
+    const content = contentInput.innerHTML;
     const color = selectedColorInput.value;
     const due_date = dueDateInput.value || null;
 
@@ -146,7 +180,7 @@ form.addEventListener("submit", async (e) => {
     });
 
     titleInput.value = "";
-    contentInput.value = "";
+    contentInput.innerHTML = "";
     dueDateInput.value = "";
     createSwatches.forEach(s => s.classList.remove("selected"));
     createSwatches[0].classList.add("selected");
@@ -155,11 +189,21 @@ form.addEventListener("submit", async (e) => {
     loadNotes();
 });
 
+function updateFormatButtonStates() {
+    document.querySelectorAll(".format-btn").forEach(btn => {
+        const command = btn.dataset.command;
+        const isActive = document.queryCommandState(command);
+        btn.classList.toggle("active", isActive);
+    });
+}
+
+document.addEventListener("selectionchange", updateFormatButtonStates);
+
 // --- Edit modal logic ---
 function openEditModal(note) {
     currentEditId = note.id;
     editTitleInput.value = note.title;
-    editContentInput.value = note.content;
+    editContentInput.innerHTML = note.content;
     editDueDateInput.value = note.due_date || "";
 
     const color = note.color || "#FFF9B0";
@@ -186,7 +230,7 @@ saveEditBtn.addEventListener("click", async () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             title: editTitleInput.value,
-            content: editContentInput.value,
+            content: editContentInput.innerHTML,
             color: editSelectedColorInput.value,
             due_date: editDueDateInput.value || null
         })

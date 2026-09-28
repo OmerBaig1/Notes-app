@@ -12,17 +12,24 @@
 
             <form id="note-form">
                 <input type="text" id="title" placeholder="Title" required>
-                <textarea id="content" placeholder="Write your note..."></textarea>
+                <div class="editor-toolbar">
+                    <button type="button" class="format-btn" data-command="bold"><b>B</b></button>
+                    <button type="button" class="format-btn" data-command="italic"><i>I</i></button>
+                </div>
+                <div id="content" class="editable-box" contenteditable="true" data-placeholder="Write your note..."></div>
 
                 <label for="due-date" style="font-size: 13px;">Due date (optional):</label>
                 <input type="date" id="due-date">
 
                 <label style="font-size: 13px;">Color:</label>
-                <div class="color-swatches" id="create-swatches">
-                    <div class="swatch selected" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
-                    <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
-                    <div class="swatch" data-color="#D6B4F7" style="background-color:#D6B4F7"></div>
-                    <div class="swatch" data-color="#F9B4D0" style="background-color:#F9B4D0"></div>
+                <div class="color-picker-wrapper">
+                    <button type="button" class="color-toggle-btn" id="create-color-toggle">🎨 Color</button>
+                    <div class="color-swatches hidden" id="create-swatches">
+                        <div class="swatch selected" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
+                        <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
+                        <div class="swatch" data-color="#D6B4F7" style="background-color:#D6B4F7"></div>
+                        <div class="swatch" data-color="#F9B4D0" style="background-color:#F9B4D0"></div>
+                    </div>
                 </div>
                 <input type="hidden" id="selected-color" value="#FFF9B0">
 
@@ -43,17 +50,24 @@
         <div class="modal">
             <h2>Edit Note</h2>
             <input type="text" id="edit-title" placeholder="Title">
-            <textarea id="edit-content" placeholder="Write your note..."></textarea>
+            <div class="editor-toolbar">
+                <button type="button" class="format-btn" data-command="bold" data-target="edit"><b>B</b></button>
+                <button type="button" class="format-btn" data-command="italic" data-target="edit"><i>I</i></button>
+            </div>
+            <div id="edit-content" class="editable-box" contenteditable="true" data-placeholder="Write your note..."></div>
 
             <label style="font-size: 13px;">Due date:</label>
             <input type="date" id="edit-due-date">
 
             <label style="font-size: 13px;">Color:</label>
-            <div class="color-swatches" id="edit-swatches">
-                <div class="swatch" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
-                <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
-                <div class="swatch" data-color="#D6B4F7" style="background-color:#D6B4F7"></div>
-                <div class="swatch" data-color="#F9B4D0" style="background-color:#F9B4D0"></div>
+            <div class="color-picker-wrapper">
+                <button type="button" class="color-toggle-btn" id="edit-color-toggle">🎨 Color</button>
+                <div class="color-swatches hidden" id="edit-swatches">
+                    <div class="swatch" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
+                    <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
+                    <div class="swatch" data-color="#D6B4F7" style="background-color:#D6B4F7"></div>
+                    <div class="swatch" data-color="#F9B4D0" style="background-color:#F9B4D0"></div>
+                </div>
             </div>
             <input type="hidden" id="edit-selected-color">
 
