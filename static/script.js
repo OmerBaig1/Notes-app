@@ -8,31 +8,73 @@ const selectedColorInput = document.getElementById("selected-color");
 const createSwatches = document.querySelectorAll("#create-swatches .swatch");
 const createColorToggle = document.getElementById("create-color-toggle");
 const createSwatchesPanel = document.getElementById("create-swatches");
-const editColorToggle = document.getElementById("edit-color-toggle");
-const editSwatchesPanel = document.getElementById("edit-swatches");
 
-// Modal elements
 const modalOverlay = document.getElementById("edit-modal-overlay");
 const editTitleInput = document.getElementById("edit-title");
 const editContentInput = document.getElementById("edit-content");
 const editDueDateInput = document.getElementById("edit-due-date");
 const editSelectedColorInput = document.getElementById("edit-selected-color");
 const editSwatches = document.querySelectorAll("#edit-swatches .swatch");
+const editColorToggle = document.getElementById("edit-color-toggle");
+const editSwatchesPanel = document.getElementById("edit-swatches");
 const saveEditBtn = document.getElementById("save-edit-btn");
 const cancelEditBtn = document.getElementById("cancel-edit-btn");
 
 let currentEditId = null;
 
-document.querySelectorAll(".format-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        const command = btn.dataset.command;
-        const targetBox = btn.dataset.target === "edit" ? editContentInput : contentInput;
-        targetBox.focus();
-        document.execCommand(command, false, null);
+// Which box (title or content) each toolbar currently targets
+let createFocusTarget = contentInput;
+let editFocusTarget = editContentInput;
+
+titleInput.addEventListener("focus", () => { createFocusTarget = titleInput; });
+contentInput.addEventListener("focus", () => { createFocusTarget = contentInput; });
+editTitleInput.addEventListener("focus", () => { editFocusTarget = editTitleInput; });
+editContentInput.addEventListener("focus", () => { editFocusTarget = editContentInput; });
+
+// Remember exactly where the cursor/selection is in each editable box
+const savedRanges = new Map();
+
+function trackSelection(el) {
+    ["mouseup", "keyup", "input"].forEach(evt => {
+        el.addEventListener(evt, () => {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0 && el.contains(sel.anchorNode)) {
+                savedRanges.set(el, sel.getRangeAt(0).cloneRange());
+            }
+        });
     });
+}
+[titleInput, contentInput, editTitleInput, editContentInput].forEach(trackSelection);
+
+function restoreSelection(el) {
+    const range = savedRanges.get(el);
+    if (range) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+}
+
+// Color dropdown toggles
+createColorToggle.addEventListener("click", () => {
+    createSwatchesPanel.classList.toggle("hidden");
+    editSwatchesPanel.classList.add("hidden");
 });
 
-//Color swatch selection (create form) ---
+editColorToggle.addEventListener("click", () => {
+    editSwatchesPanel.classList.toggle("hidden");
+    createSwatchesPanel.classList.add("hidden");
+});
+
+document.addEventListener("click", (e) => {
+    if (!createColorToggle.contains(e.target) && !createSwatchesPanel.contains(e.target)) {
+        createSwatchesPanel.classList.add("hidden");
+    }
+    if (!editColorToggle.contains(e.target) && !editSwatchesPanel.contains(e.target)) {
+        editSwatchesPanel.classList.add("hidden");
+    }
+});
+
 createSwatches.forEach(swatch => {
     swatch.addEventListener("click", () => {
         createSwatches.forEach(s => s.classList.remove("selected"));
@@ -42,7 +84,6 @@ createSwatches.forEach(swatch => {
     });
 });
 
-//Color swatch selection (edit modal) ---
 editSwatches.forEach(swatch => {
     swatch.addEventListener("click", () => {
         editSwatches.forEach(s => s.classList.remove("selected"));
@@ -52,7 +93,50 @@ editSwatches.forEach(swatch => {
     });
 });
 
-//Fetches notes from the server and displays them
+// Bold / Italic buttons
+document.querySelectorAll(".format-btn").forEach(btn => {
+    btn.addEventListener("mousedown", (e) => e.preventDefault());
+
+    btn.addEventListener("click", () => {
+        const command = btn.dataset.command;
+        const isEdit = btn.dataset.target === "edit";
+        const target = isEdit ? editFocusTarget : createFocusTarget;
+
+        target.focus();
+        restoreSelection(target);
+        document.execCommand(command, false, null);
+
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+            savedRanges.set(target, sel.getRangeAt(0).cloneRange());
+        }
+
+        updateFormatButtonStates(isEdit);
+    });
+});
+
+function updateFormatButtonStates(isEdit) {
+    document.querySelectorAll(".format-btn").forEach(btn => {
+        const belongsToEdit = btn.dataset.target === "edit";
+        if (belongsToEdit !== isEdit) return;
+
+        const command = btn.dataset.command;
+        const isActive = document.queryCommandState(command);
+        btn.classList.toggle("active", isActive);
+    });
+}
+
+document.addEventListener("selectionchange", () => {
+    const active = document.activeElement;
+    if (active === contentInput || active === titleInput) {
+        updateFormatButtonStates(false);
+    } else if (active === editContentInput || active === editTitleInput) {
+        updateFormatButtonStates(true);
+    }
+    // Clicking elsewhere (buttons, due date, background) no longer clears
+    // the toolbar — it just keeps showing the last real state.
+});
+
 async function loadNotes() {
     const response = await fetch("/notes");
     const notes = await response.json();
@@ -65,7 +149,7 @@ async function loadNotes() {
         noteDiv.style.backgroundColor = note.color || "#FFF9B0";
 
         const titleEl = document.createElement("h3");
-        titleEl.textContent = note.title;
+        titleEl.innerHTML = note.title;
 
         const contentEl = document.createElement("p");
         contentEl.innerHTML = note.content;
@@ -98,7 +182,6 @@ async function loadNotes() {
         notesList.appendChild(noteDiv);
     });
 
-    //Sidebar: notes with due dates
     const notesWithDates = notes
         .filter(note => note.due_date)
         .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
@@ -129,7 +212,7 @@ async function loadNotes() {
         }
 
         const titleSpan = document.createElement("strong");
-        titleSpan.textContent = note.title;
+        titleSpan.innerHTML = note.title;
 
         const dueLabel = document.createElement("span");
         dueLabel.className = "due-label";
@@ -145,30 +228,15 @@ async function loadNotes() {
     });
 }
 
-createColorToggle.addEventListener("click", () => {
-    createSwatchesPanel.classList.toggle("hidden");
-    editSwatchesPanel.classList.add("hidden"); // close the other one if open
-});
-
-editColorToggle.addEventListener("click", () => {
-    editSwatchesPanel.classList.toggle("hidden");
-    createSwatchesPanel.classList.add("hidden");
-});
-
-document.addEventListener("click", (e) => {
-    if (!createColorToggle.contains(e.target) && !createSwatchesPanel.contains(e.target)) {
-        createSwatchesPanel.classList.add("hidden");
-    }
-    if (!editColorToggle.contains(e.target) && !editSwatchesPanel.contains(e.target)) {
-        editSwatchesPanel.classList.add("hidden");
-    }
-});
-
-// New Note
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const title = titleInput.value;
+    if (titleInput.textContent.trim() === "") {
+        alert("Please enter a title.");
+        return;
+    }
+
+    const title = titleInput.innerHTML;
     const content = contentInput.innerHTML;
     const color = selectedColorInput.value;
     const due_date = dueDateInput.value || null;
@@ -179,7 +247,7 @@ form.addEventListener("submit", async (e) => {
         body: JSON.stringify({ title, content, color, due_date })
     });
 
-    titleInput.value = "";
+    titleInput.innerHTML = "";
     contentInput.innerHTML = "";
     dueDateInput.value = "";
     createSwatches.forEach(s => s.classList.remove("selected"));
@@ -189,20 +257,9 @@ form.addEventListener("submit", async (e) => {
     loadNotes();
 });
 
-function updateFormatButtonStates() {
-    document.querySelectorAll(".format-btn").forEach(btn => {
-        const command = btn.dataset.command;
-        const isActive = document.queryCommandState(command);
-        btn.classList.toggle("active", isActive);
-    });
-}
-
-document.addEventListener("selectionchange", updateFormatButtonStates);
-
-// --- Edit modal logic ---
 function openEditModal(note) {
     currentEditId = note.id;
-    editTitleInput.value = note.title;
+    editTitleInput.innerHTML = note.title;
     editContentInput.innerHTML = note.content;
     editDueDateInput.value = note.due_date || "";
 
@@ -229,7 +286,7 @@ saveEditBtn.addEventListener("click", async () => {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            title: editTitleInput.value,
+            title: editTitleInput.innerHTML,
             content: editContentInput.innerHTML,
             color: editSelectedColorInput.value,
             due_date: editDueDateInput.value || null
@@ -240,7 +297,6 @@ saveEditBtn.addEventListener("click", async () => {
     loadNotes();
 });
 
-// Deletes note
 async function deleteNote(id) {
     const confirmed = confirm("Delete this note?");
     if (!confirmed) return;

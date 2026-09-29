@@ -10,20 +10,11 @@
         <div class="container">
             <h1>Notes</h1>
 
-            <form id="note-form">
-                <input type="text" id="title" placeholder="Title" required>
-                <div class="editor-toolbar">
-                    <button type="button" class="format-btn" data-command="bold"><b>B</b></button>
-                    <button type="button" class="format-btn" data-command="italic"><i>I</i></button>
-                </div>
-                <div id="content" class="editable-box" contenteditable="true" data-placeholder="Write your note..."></div>
-
-                <label for="due-date" style="font-size: 13px;">Due date (optional):</label>
-                <input type="date" id="due-date">
-
-                <label style="font-size: 13px;">Color:</label>
+        <form id="note-form">
+            <div class="form-header">
+                <div id="title" class="editable-title" contenteditable="true" data-placeholder="Title"></div>
                 <div class="color-picker-wrapper">
-                    <button type="button" class="color-toggle-btn" id="create-color-toggle">🎨 Color</button>
+                    <button type="button" class="kebab-btn" id="create-color-toggle">⋮</button>
                     <div class="color-swatches hidden" id="create-swatches">
                         <div class="swatch selected" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
                         <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
@@ -31,10 +22,21 @@
                         <div class="swatch" data-color="#F9B4D0" style="background-color:#F9B4D0"></div>
                     </div>
                 </div>
-                <input type="hidden" id="selected-color" value="#FFF9B0">
+            </div>
+            <input type="hidden" id="selected-color" value="#FFF9B0">
 
-                <button type="submit">Add Note</button>
-            </form>
+            <div id="content" class="editable-box" contenteditable="true" data-placeholder="Write your note..."></div>
+
+            <label for="due-date" style="font-size: 13px;">Due date (optional):</label>
+            <input type="date" id="due-date">
+
+            <div class="editor-toolbar">
+                <button type="button" class="format-btn" data-command="bold"><b>B</b></button>
+                <button type="button" class="format-btn" data-command="italic"><i>I</i></button>
+            </div>
+
+            <button type="submit">Add Note</button>
+        </form>
 
             <div id="notes-list"></div>
         </div>
@@ -46,22 +48,14 @@
     </div>
 
     <!-- Edit Modal -->
-    <div id="edit-modal-overlay" class="modal-overlay hidden">
-        <div class="modal">
-            <h2>Edit Note</h2>
-            <input type="text" id="edit-title" placeholder="Title">
-            <div class="editor-toolbar">
-                <button type="button" class="format-btn" data-command="bold" data-target="edit"><b>B</b></button>
-                <button type="button" class="format-btn" data-command="italic" data-target="edit"><i>I</i></button>
-            </div>
-            <div id="edit-content" class="editable-box" contenteditable="true" data-placeholder="Write your note..."></div>
+<div id="edit-modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+        <h2>Edit Note</h2>
 
-            <label style="font-size: 13px;">Due date:</label>
-            <input type="date" id="edit-due-date">
-
-            <label style="font-size: 13px;">Color:</label>
+        <div class="form-header">
+            <div id="edit-title" class="editable-title" contenteditable="true" data-placeholder="Title"></div>
             <div class="color-picker-wrapper">
-                <button type="button" class="color-toggle-btn" id="edit-color-toggle">🎨 Color</button>
+                <button type="button" class="kebab-btn" id="edit-color-toggle">⋮</button>
                 <div class="color-swatches hidden" id="edit-swatches">
                     <div class="swatch" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
                     <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
@@ -69,14 +63,25 @@
                     <div class="swatch" data-color="#F9B4D0" style="background-color:#F9B4D0"></div>
                 </div>
             </div>
-            <input type="hidden" id="edit-selected-color">
+        </div>
+        <input type="hidden" id="edit-selected-color">
 
-            <div class="modal-actions">
-                <button id="save-edit-btn">Save</button>
-                <button id="cancel-edit-btn" type="button">Cancel</button>
-            </div>
+        <div id="edit-content" class="editable-box" contenteditable="true" data-placeholder="Write your note..."></div>
+
+        <label style="font-size: 13px;">Due date:</label>
+        <input type="date" id="edit-due-date">
+
+        <div class="editor-toolbar">
+            <button type="button" class="format-btn" data-command="bold" data-target="edit"><b>B</b></button>
+            <button type="button" class="format-btn" data-command="italic" data-target="edit"><i>I</i></button>
+        </div>
+
+        <div class="modal-actions">
+            <button id="save-edit-btn">Save</button>
+            <button id="cancel-edit-btn" type="button">Cancel</button>
         </div>
     </div>
+</div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
