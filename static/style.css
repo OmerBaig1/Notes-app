@@ -112,6 +112,8 @@ button:hover {
     border-radius: 6px;
     margin-bottom: 12px;
     font-size: 16px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .upcoming-item .due-label {
@@ -147,11 +149,22 @@ button:hover {
 .color-swatches {
     display: flex;
     gap: 10px;
+    position: absolute;
+    top: 130%;
+    right: 0;
+    background: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 50;
+    width: max-content;
 }
 
 .swatch {
     width: 28px;
     height: 28px;
+    flex-shrink: 0;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid transparent;
@@ -369,3 +382,60 @@ button:hover {
 .kebab-btn:hover {
     background-color: #e8e8e8;
 }
+
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+.toast.hidden {
+    display: none;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    overflow: visible;
+}
+
+.color-picker-wrapper {
+    position: relative;
+}
+
+.editable-title {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    min-height: 20px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.editable-title {
+    padding: 8px;
+    padding-right: 36px; /* leaves room so text doesn't run under the kebab button */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    min-height: 20px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+

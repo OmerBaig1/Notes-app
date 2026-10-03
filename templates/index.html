@@ -11,10 +11,9 @@
             <h1>Notes</h1>
 
         <form id="note-form">
-            <div class="form-header">
-                <div id="title" class="editable-title" contenteditable="true" data-placeholder="Title"></div>
+            <div class="editor-header">
                 <div class="color-picker-wrapper">
-                    <button type="button" class="kebab-btn" id="create-color-toggle">⋮</button>
+                    <button type="button" class="kebab-btn" id="create-color-toggle">⋯</button>
                     <div class="color-swatches hidden" id="create-swatches">
                         <div class="swatch selected" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
                         <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
@@ -23,9 +22,10 @@
                     </div>
                 </div>
             </div>
-            <input type="hidden" id="selected-color" value="#FFF9B0">
 
+            <div id="title" class="editable-title" contenteditable="true" data-placeholder="Title"></div>
             <div id="content" class="editable-box" contenteditable="true" data-placeholder="Write your note..."></div>
+            <input type="hidden" id="selected-color" value="#FFF9B0">
 
             <label for="due-date" style="font-size: 13px;">Due date (optional):</label>
             <input type="date" id="due-date">
@@ -52,10 +52,9 @@
     <div class="modal">
         <h2>Edit Note</h2>
 
-        <div class="form-header">
-            <div id="edit-title" class="editable-title" contenteditable="true" data-placeholder="Title"></div>
+        <div class="editor-header">
             <div class="color-picker-wrapper">
-                <button type="button" class="kebab-btn" id="edit-color-toggle">⋮</button>
+                <button type="button" class="kebab-btn" id="edit-color-toggle">⋯</button>
                 <div class="color-swatches hidden" id="edit-swatches">
                     <div class="swatch" data-color="#FFF9B0" style="background-color:#FFF9B0"></div>
                     <div class="swatch" data-color="#AEE1F9" style="background-color:#AEE1F9"></div>
@@ -64,9 +63,10 @@
                 </div>
             </div>
         </div>
-        <input type="hidden" id="edit-selected-color">
 
+        <div id="edit-title" class="editable-title" contenteditable="true" data-placeholder="Title"></div>
         <div id="edit-content" class="editable-box" contenteditable="true" data-placeholder="Write your note..."></div>
+        <input type="hidden" id="edit-selected-color">
 
         <label style="font-size: 13px;">Due date:</label>
         <input type="date" id="edit-due-date">
@@ -83,5 +83,6 @@
     </div>
 </div>
 
+<div id="toast" class="toast hidden"></div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>

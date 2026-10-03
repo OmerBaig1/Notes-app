@@ -255,6 +255,7 @@ form.addEventListener("submit", async (e) => {
     selectedColorInput.value = createSwatches[0].dataset.color;
 
     loadNotes();
+    showToast("Note created ✓");
 });
 
 function openEditModal(note) {
@@ -303,6 +304,21 @@ async function deleteNote(id) {
 
     await fetch(`/notes/${id}`, { method: "DELETE" });
     loadNotes();
+}
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.remove("hidden");
+
+    // Force a reflow so the transition triggers properly
+    void toast.offsetWidth;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.classList.add("hidden"), 300); // wait for fade-out before hiding
+    }, 2000);
 }
 
 loadNotes();
